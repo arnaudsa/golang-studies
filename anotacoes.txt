@@ -1,0 +1,198 @@
+package main - pacote principal onde tem meu executavel
+function main - função principal
+
+go build hello.go - compila um programa
+./hello - executa o programa
+go run   hello.go - compila e executa um programa
+
+exibir documentacao offline
+godoc -http=:6060
+
+verificar as informações do ambientes
+goenv
+
+faz analise do seu código
+go vet main.go
+go doc cmd/vet
+
+instalando dependências
+go get -u github.com/go-sql-driver/mysql
+
+Variáveis
+-------------
+var nome string = "Arnaud"
+
+Quando não atribuimos um valor a uma variável ela será iniciada com um valor default,
+string = "", números=0
+
+Se tiver alguma variável que não estamos utilizando go vai gerar erro de compilação
+
+
+
+O go também tem o recurso de inferência de variáveis, com isso não precisamos declarar seu tipo, ele automaticamente
+vai descobrir qual o tipo de sua variável.
+
+exemplo 1
+var nome = "Arnaud"
+
+neste exemplo não precisamos utilizar a palavra var, pois já estamos criando uma variável e atribuindo seu valor
+nome := "Arnaud"
+
+como saber o tipo da variavel
+reflect.TypeOf(variavel);
+
+
+convertendo variaveis
+------------------------------------------------------------------------
+x := 2.4
+y := 2
+fmt.Println(x /float64(y)
+
+nota := 6.9
+notaFinal := int(nota)
+
+String para inteiro
+num, err := strconv.Atoi("123")
+
+String para boolean
+verdadeiro, err := strconv.ParseBool("true")
+
+Bibliotecas do GO
+https://pkg.go.dev/std
+
+Array
+------------------------------------------------------------------------
+Criando um Array - o array tem um tamanho fixo
+var estados [2] string
+estados[0] = "São Paulo"
+
+Para usarmos um array com tamanho dinamico usamos slices
+estados := []string {"São Paulo", "Minas Gerais", "Rio de Janeiro"}
+
+para saber um tamanho de um array utilizamos a função len()
+len(estados)
+
+para verificar a capacidade de um array usamos a função cap()
+cap(estados)
+
+para adicionar novo item em um slice usamos a função append
+append(estados, "Espirito Santo")
+
+sempre que utilizamos a função append sua capacidade dobra
+
+Iterando em um array
+for i := 0; i<len(estados); i++ {
+    fmt.Println(estados[i])
+}
+
+// Iterando em um array com range
+for i, v:= range estados{
+    fmt.Println("Posicao", i, "Valor", v)
+}
+
+------------------------------------------------------------------------
+
+Adicionando um delay no fluxo principal
+time.Sleep(5 * time.Second)
+
+
+
+Lendo arquivos
+------------------------------------------------------------------------
+
+Para ler o arquivo inteiro de uma vez podemos utilizar o ioutil
+content,_ :=ioutil.ReadFile("sites.txt")
+fmt.Println("Conteudo do arquivo", string(content))
+
+
+Para ler o arquivo linha a linha podemos utilizar o bufio
+var sites []string
+
+arquivo, err := os.Open("sites.txt")
+if err != nil {
+    fmt.Println("Ocorreu um erro:", err)
+}
+
+leitor := bufio.NewReader(arquivo)
+for {
+    linha, err := leitor.ReadString('\n')
+    linha = strings.TrimSpace(linha)
+    sites = append(sites, linha)
+
+    if err == io.EOF {
+        break
+    }
+}
+
+arquivo.Close()
+
+
+Escrevendo em Arquivos
+------------------------------------------------------------------------
+arquivo, err := os.OpenFile("logs.txt", os.O_CREATE|os.O_RDWR|os.O_APPEND,0666)
+
+if err != nil {
+    fmt.Println("Ocorreu um erro:", err)
+}
+registro := time.Now().Format("02/01/2006 15:04:05") + " - " + site + " - online: " + strconv.FormatBool(status) + "\n"
+arquivo.WriteString(registro)
+arquivo.Close()
+
+
+Trabalhando com data
+------------------------------------------------------------------------
+time.Now().Format("02/01/2006 15:04:05")
+https://golang.org/src/time/format.go
+
+
+
+Structs
+------------------------------------------------------------------------
+type ContaCorrente struct {
+	Titular       Titular
+	NumeroAgencia, NumeroConta   int
+	saldo         float64
+}
+
+func (c * ContaCorrente) Sacar(valorSaque float64) string {
+	podeSacar := valorSaque > 0 && valorSaque <= c.Saldo
+	if podeSacar {
+		c.saldo -= valorSaque
+		return "Saque efetuado com sucesso!"
+	}
+	return "Saldo insuficiente"
+}
+
+func (c *ContaCorrente) Depositar(valorDoDeposito float64) (string, float64) {
+	if valorDoDeposito > 0 {
+		c.saldo += valorDoDeposito
+		return "Você depositou: " + fmt.Sprintf("%.2f", valorDoDeposito), c.saldo
+	}
+	return "Valor para deposito deve ser maior que Zero.", c.saldo
+}
+
+func (c ContaCorrente) ObterSaldo() float64 {
+	return c.saldo
+}
+------------------------------------------------------------------------
+Usando Structs
+contaDoArnaud := ContaCorrente{Titular: "Arnaud Santana Alves", NumeroAgencia: 4170, NumeroConta: 24899}
+ContaCorrente.Depositar(777.77)
+fmt.Println(contaDoArnaud)
+fmt.Println(contaDoArnaud.ObterSaldo())
+
+fmt.Println(contaDoArnaud.Sacar(300.00))
+fmt.Println(contaDoArnaud)
+
+var contaDaLilia *ContaCorrente
+contaDaLilia = new(ContaCorrente)
+contaDaLilia.Titular = "Lilia Maria dos Santos"
+contaDaLilia.NumeroAgencia = 4170
+contaDaLilia.NumeroConta = 777567
+contaDaLilia.Saldo = 456.77
+
+fmt.Println(*contaDaLilia)
+
+
+------------------------------------------------------------------------
+https://pkg.go.dev/
